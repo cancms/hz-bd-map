@@ -36,14 +36,14 @@ export default defineConfig({
     ext: '.gz', //文件类型
   })
   ],
-  server: {
-    // 'https://c.m.163.com/ug/api/wuhan/app/data/list-total'
-    proxy: {
-      '/163': {
-        target: 'https://c.m.163.com/',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/163/, '')
-      }
-    }
-  },
+  // server: {
+  //   // 'https://c.m.163.com/ug/api/wuhan/app/data/list-total'
+  //   proxy: {
+  //     '/163': {
+  //       target: 'https://c.m.163.com/',
+  //       changeOrigin: true,
+  //       rewrite: (path) => path.replace(/^\/163/, '')
+  //     }
+  //   }
+  // },
 })
