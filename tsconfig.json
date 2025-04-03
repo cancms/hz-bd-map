@@ -20,7 +20,7 @@
     // 解析非相对模块名的基准目录
 //    "baseUrl": "./", // local
 
-    "baseUrl": "./hz-bd-map/", // github remote
+    "baseUrl": "./", // github remote
 
 
     // 模块名到基于 baseUrl的路径映射的列表。
