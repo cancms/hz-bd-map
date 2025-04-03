@@ -5,6 +5,7 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "strict": true,
+    "allowJs": true,
     "jsx": "preserve",
     "sourceMap": true,
     "resolveJsonModule": true,
@@ -15,8 +16,13 @@
       "DOM"
     ],
     "skipLibCheck": true,
+
     // 解析非相对模块名的基准目录
-    "baseUrl": "./",
+//    "baseUrl": "./", // local
+
+    "baseUrl": "./hz-bd-map/", // github remote
+
+
     // 模块名到基于 baseUrl的路径映射的列表。
     "paths": {
       "@": [
