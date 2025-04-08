@@ -4,20 +4,22 @@
 </template>
 
 <script setup>
-import samplePoints from '@/views/home/components/map/sample_points.json'
+// import samplePoints from '@/views/home/components/map/sample_points.json'
 import baiduService from '@/views/home/service/baidu/baiduService.js' // 加上.js
 
 
 // 地图加载完后请求远程数据
-function afterMapLoaded(BMap, map) {
-  baiduService.mapVService.displayMarkers(BMap, map, samplePoints)
+async function afterMapLoaded(BMap, map) {
+  const bikePoints = await import('@/views/home/components/map/sample_points2.json')
+  // baiduService.mapVService.displayMarkers(BMap, map, bikePoints)
+  baiduService.mapVService.displayBikes(BMap, map, bikePoints)
 }
 
 
-const ready = ({BMap,map})=>{
+const ready = async ({BMap,map}) => {
   //  对地图进行自定义操作
   baiduService.initMap(BMap, map);
-  afterMapLoaded(BMap, map);
+  await afterMapLoaded(BMap, map);
 };
 </script>
 

@@ -37,7 +37,7 @@ import midnightStyle from '@/views/home/components/map/baidu_map_midnight.json'
 // https://mapv.baidu.com/examples/#baidu-map-point-cluster.html
 function createMapVService() {
   const service = {
-    displayMarkers,
+    displayBikes,
   }
 
   const localData = {
@@ -47,7 +47,8 @@ function createMapVService() {
 
 
   function lngLatKey(jsonPointItem) {
-    const lngLat = `${jsonPointItem.location.longitude}_${jsonPointItem.location.latitude}`;
+    // const lngLat = `${jsonPointItem.location.longitude}_${jsonPointItem.location.latitude}`;
+    const lngLat = `${jsonPointItem.lng}_${jsonPointItem.lat}`;
     return lngLat
   }
 
@@ -90,9 +91,54 @@ function createMapVService() {
   }
 
 
-  // mapv.js在index.html中引用，mapv报错this.show is not a function
-  // 原因： mapv.js加载先于地图，导致BMap$1为undefined，如下：
-  // https://blog.csdn.net/Liyan_Yanna/article/details/114640595
+  /***
+   *
+   * samplePoints: 结构
+   * {
+   *   "bikes": [
+   *     {
+   *       "id": 1,
+   *       "location": {
+   *         "latitude": 30.30263,
+   *         "longitude": 120.33761
+   *       },
+   *       "status": "maintenance",
+   *       "bike_type": "normal_bike",
+   *       "company": "company_A"
+   *     },
+   *     ...
+   *    ]
+   *  }
+   *
+   *
+   *  新结构
+   *
+   *  {
+   *   "count": 5623,
+   *   "data": [
+   *     {
+   *       "bikeid": 221325,
+   *       "company": "mobike",
+   *       "lat": 39.9049,
+   *       "lng": 117.0659,
+   *       "state": "in use"
+   *     },
+   *     ...
+   *   ]
+   *  }
+   *
+   *
+   *   mapv.js在index.html中引用，mapv报错this.show is not a function
+   *   原因： mapv.js加载先于地图，导致BMap$1为undefined，如下：
+   *   https://blog.csdn.net/Liyan_Yanna/article/details/114640595
+   *
+   *
+   * @param BMap
+   * @param map
+   * @param samplePoints
+   * @return {boolean}
+   */
+
   function displayMarkers(BMap, map, samplePoints) {
     groupByLngLat(samplePoints);
     const data = [];
@@ -161,6 +207,104 @@ function createMapVService() {
 
     return true;
   }
+
+
+
+  function markerOptions() {
+
+    const options = {
+      // shadowColor: 'rgba(255, 250, 50, 1)',
+      // shadowBlur: 10,
+      // 非聚合点的颜色和大小，未设置icon或icon获取失败时使用
+      fillStyle: 'rgba(18, 166, 242, 1)',
+      size: 50 / 3 / 2, // 非聚合点的半径
+      // 非聚合时点的icon设置，会被具体点的设置覆盖，可设置为空
+      // iconOptions: {
+      //     url: 'images/marker.png',
+      //     width: 50 / 3,
+      //     height: 77 / 3,
+      //     offset: {
+      //         x: 0,
+      //         y: 0
+      //     }
+      // },
+      minSize: 8, // 聚合点最小半径
+      maxSize: 31, // 聚合点最大半径
+      globalAlpha: 0.8, // 透明度
+      clusterRadius: 150, // 聚合像素半径
+      maxClusterZoom: 18, // 最大聚合的级别
+      maxZoom: 19, // 最大显示级别
+      minPoints: 2, // 最少聚合点数，点数多于此值才会被聚合
+      extent: 400, // 聚合的细腻程度，越高聚合后点越密集
+      label: { // 聚合文本样式
+        show: true, // 是否显示
+        fillStyle: 'white',
+        // shadowColor: 'yellow',
+        // font: '20px Arial',
+        // shadowBlur: 10,
+      },
+      gradient: { 0: "blue", 0.5: 'yellow', 1.0: "rgb(120,32,198)"}, // 聚合图标渐变色
+      draw: 'cluster',
+      methods: {
+        click: markerClickFn,
+      }
+    }
+
+    return options;
+  }
+
+  function createMarkerDataset(bikePointsRs) {
+    const data = [];
+    const bikePointsData = bikePointsRs.data || []
+    groupByLngLat({bikes: bikePointsData});
+    bikePointsData.map(item => {
+      data.push({
+        geometry: {
+          type: 'Point',
+          coordinates: [item.lng, item.lat]
+        },
+        itemData: item,
+        count: localData.pointsMap[lngLatKey(item)].length || 1
+        // fillStyle: 'rgba(18, 166, 242, 0.5)',
+        // size: 60
+      })
+    })
+    return data;
+  }
+  /***
+   *
+   * 后端返回数据：
+   * {
+   *   "count": 5623,
+   *   "data": [
+   *     {
+   *       "bikeid": 221325,
+   *       "company": "mobike",
+   *       "lat": 39.9049,
+   *       "lng": 117.0659,
+   *       "state": "in use"
+   *     },
+   *     ...
+   *   ]
+   *  }
+   *
+   * @param bikePointsRs
+   */
+  function displayBikes(BMap, map, bikePointsRs) {
+
+    const data = createMarkerDataset(bikePointsRs);
+    const options = markerOptions()
+
+    // 动态导入组件, mapv.js加载先于地图，导致BMap$1为undefined,  ->  this.show is not a function
+    import('mapv').then(mapv => {
+      const dataSet = new mapv.DataSet(data);
+      const mapvLayer = new mapv.baiduMapLayer(map, dataSet, options);
+      // mapvLayer.show(); // 显示图层
+    });
+
+    return true;
+  }
+
 
 
   return service;
