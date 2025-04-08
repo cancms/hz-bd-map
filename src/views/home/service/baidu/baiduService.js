@@ -263,6 +263,7 @@ function createMapVService() {
           type: 'Point',
           coordinates: [item.lng, item.lat]
         },
+        properties: { text: `${item.lng}, ${item.lat}`},
         itemData: item,
         count: localData.pointsMap[lngLatKey(item)].length || 1
         // fillStyle: 'rgba(18, 166, 242, 0.5)',

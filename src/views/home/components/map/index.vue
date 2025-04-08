@@ -6,6 +6,7 @@
 <script setup>
 // import samplePoints from '@/views/home/components/map/sample_points.json'
 import baiduService from '@/views/home/service/baidu/baiduService.js' // 加上.js
+import fenceService from '@/views/home/service/baidu/fenceService.js' // 加上.js
 
 
 // 地图加载完后请求远程数据
@@ -19,6 +20,7 @@ async function afterMapLoaded(BMap, map) {
 const ready = async ({BMap,map}) => {
   //  对地图进行自定义操作
   baiduService.initMap(BMap, map);
+  fenceService.drawFencePolygons(BMap, map);
   await afterMapLoaded(BMap, map);
 };
 </script>
